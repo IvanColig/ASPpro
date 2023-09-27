@@ -48,47 +48,58 @@ public:
 
     // Brisanje zapisa
     void deleteBy(const string& table, const string& arg) {
-        vector<string>& vec = mapa.at(table);
+        vector<string> v1;
+        vector<string> v2;
+        vector<string> v3;
 
-        for (int i = broj_podataka - 1; i >= 0 ; i--) {
-            if (vec[i] == arg) {
-                mapa.at("years").erase(mapa.at("years").begin() + i);
-                mapa.at("days").erase(mapa.at("days").begin() + i);
-                mapa.at("lengths").erase(mapa.at("lengths").begin() + i);
+        for (int i = 0; i < broj_podataka; i++) {
+            if (mapa.at(table)[i].compare(arg) != 0) {
+                v1.push_back(mapa.at("years")[i]);
+                v2.push_back(mapa.at("days")[i]);
+                v3.push_back(mapa.at("lengths")[i]);
             }
         }
-    }
 
+        mapa["years"] = v1;
+        mapa["days"] = v2;
+        mapa["lengths"] = v3;
+    }
+ 
 
     // Brisanje prvih n zapisa
     void deleteNBy(const string& table, const string& arg, int n) {
-    vector<string>& vec = mapa.at(table);
-    vector<string>& yearsVec = mapa.at("years");
-    vector<string>& daysVec = mapa.at("days");
-    vector<string>& lengthsVec = mapa.at("lengths");
+        vector<string> v1;
+        vector<string> v2;
+        vector<string> v3;
 
-    for (int i = broj_podataka - 1; i >= 0 && n > 0; i--) {
-        if (vec[i] == arg) {
-            yearsVec.erase(yearsVec.begin() + i);
-            daysVec.erase(daysVec.begin() + i);
-            lengthsVec.erase(lengthsVec.begin() + i);
-            n--;
+        for (int i = 0; i < broj_podataka; i++) {
+            if (n > 0 && mapa.at(table)[i].compare(arg) == 0) {
+                n--;
+            }
+            else {
+                v1.push_back(mapa.at("years")[i]);
+                v2.push_back(mapa.at("days")[i]);
+                v3.push_back(mapa.at("lengths")[i]);
+            }
         }
+
+        mapa["years"] = v1;
+        mapa["days"] = v2;
+        mapa["lengths"] = v3;
     }
-}
 
     // Dohvaćanje najmanje vrijednosti
-    string getMinValueByKey(const string& table) {
+    string getMinValue(const string& table) {
         return *min_element(mapa[table].begin(), mapa[table].end());
     }
 
     // Dohvaćanje najveće vrijednosti
-    string getMaxValueByKey(const string& table) {
+    string getMaxValue(const string& table) {
         return *max_element(mapa[table].begin(), mapa[table].end());
     }
 
     // Dohvaćanje n najmanjih vrijednosti
-    vector<string> getNSmallestValuesByKey(const string& table, int n) {
+    vector<string> getNSmallestValues(const string& table, int n) {
         vector<string> results;
         vector<string>& vec = mapa[table];
         vector<string> sortedVec = vec;
@@ -103,7 +114,7 @@ public:
     }
 
     // Dohvaćanje n najvećih vrijednosti
-    vector<string> getNLargestValuesByKey(const string& table, int n) {
+    vector<string> getNLargestValues(const string& table, int n) {
         vector<string> results;
         vector<string>& vec = mapa[table];
         vector<string> rSortedVec = vec;
@@ -167,8 +178,8 @@ private:
 
 int main() {
     const string datoteka = "C:\\asp\\BitcoinHeistData.csv";
-    const int broj_podataka = 500;
-
+    const int broj_podataka = 500000;
+    
     string godinaPretrazivanja = "2017";
     string godinaBrisanja = "2017";
     string novaGodina = "2019";
@@ -180,7 +191,7 @@ int main() {
     vector<string> newLengths = {"300", "250"};
 
     int nbrisanja = 2;
-    int n = 4;
+    int n = 3;
 
     CSVDatabase db(datoteka, broj_podataka);
 
@@ -200,18 +211,18 @@ int main() {
     db.deleteBy("years", godinaBrisanja);
     db.deleteNBy("years", godinaBrisanja, nbrisanja);
     
-    string minYear = db.getMinValueByKey("years");
-    string maxYear = db.getMaxValueByKey("years");
+    string minYear = db.getMinValue("years");
+    string maxYear = db.getMaxValue("years");
     cout << "Minimalna vrijednost: " << minYear << endl;
     cout << "Maximalna vrijednost: " << maxYear << endl;
 
-    vector<string> nSmallestYears = db.getNSmallestValuesByKey("years", n);
+    vector<string> nSmallestYears = db.getNSmallestValues("years", n);
     cout << "N najmanjih vrijednosti:" << endl;
     for (const string& year : nSmallestYears) {
         cout << year << endl;
     }
 
-    vector<string> nLargestYears = db.getNLargestValuesByKey("years", n);
+    vector<string> nLargestYears = db.getNLargestValues("years", n);
     cout << "N najvećih vrijednosti:" << endl;
     for (const string& year : nLargestYears) {
         cout << year << endl;
@@ -220,6 +231,18 @@ int main() {
     db.addRecord(novaGodina, noviDan, novaDuzina);
     db.addNRecords(newYears, newDays, newLengths, newYears.size());
     */
+
+    /*db.deleteBy("years", godinaBrisanja);
+    for (const auto& result : db.searchBy("years", godinaPretrazivanja)) {
+        cout << result << endl;
+    }*/
+
+
+    db.deleteNBy("years", "2017", 2);
+    for (const auto& result : db.searchNBy("years", "2017", 6)) {
+        cout << result << endl;
+    }
+
 
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> duration = end - start;
